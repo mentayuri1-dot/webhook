@@ -661,12 +661,13 @@ def clear_requests():
 
 @app.route('/health', methods=['GET'])
 def health_check():
-    """Health check endpoint"""
+    """Health check endpoint for Dokploy"""
     return jsonify({
         "status": "healthy",
         "redirect_url": REDIRECT_URL,
         "listen_port": LISTEN_PORT,
-        "total_requests": len(received_requests)
+        "total_requests": len(received_requests),
+        "timestamp": datetime.now().isoformat()
     }), 200
 
 def main():
