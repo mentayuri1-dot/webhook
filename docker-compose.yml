@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  webhook-redirector:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - REDIRECT_URL=http://localhost:8080/webhook
+      - LISTEN_PORT=5000
+      - HOST=0.0.0.0
+    volumes:
+      - .:/app
