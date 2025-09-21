@@ -163,6 +163,18 @@ For your specific setup with Dokploy at http://31.220.87.209:3000/:
 2. Make sure port 5000 is accessible in your firewall
 3. Set the REDIRECT_URL to wherever you want the requests forwarded
 
+**To configure domains in Dokploy:**
+1. After deploying the application, go to the application settings in Dokploy
+2. In the "Domains" tab, add your custom domain
+3. Make sure the port is set to 5000
+4. The application will be accessible at your custom domain
+
+**Dokploy-specific configuration:**
+- The application includes a `dokploy.json` configuration file
+- Health check endpoint: `/health`
+- Port: 5000
+- Environment variables can be set in Dokploy's application settings
+
 ### Using with Ngrok (for local testing)
 
 If you want to test with a local machine:

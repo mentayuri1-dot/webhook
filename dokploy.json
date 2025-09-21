@@ -1,0 +1,13 @@
+{
+  "name": "webhook-redirector",
+  "description": "Webhook redirector with dashboard UI",
+  "port": 5000,
+  "healthCheckPath": "/health",
+  "domains": [],
+  "env": {
+    "REDIRECT_URL": "http://localhost:8080/webhook",
+    "LISTEN_PORT": "5000",
+    "HOST": "0.0.0.0",
+    "DEBUG": "True"
+  }
+}

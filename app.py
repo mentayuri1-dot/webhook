@@ -674,7 +674,9 @@ def main():
     logger.info(f"Starting webhook listener on {HOST}:{LISTEN_PORT}")
     logger.info(f"Redirecting requests to {REDIRECT_URL}")
     logger.info(f"Dashboard available at http://{HOST}:{LISTEN_PORT}/dashboard")
-    app.run(host=HOST, port=LISTEN_PORT, debug=Config.DEBUG)
+    
+    # For Dokploy, we need to ensure we bind to all interfaces
+    app.run(host='0.0.0.0', port=LISTEN_PORT, debug=Config.DEBUG)
 
 if __name__ == '__main__':
     main()
