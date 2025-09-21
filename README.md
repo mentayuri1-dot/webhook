@@ -1,6 +1,6 @@
 # Webhook Redirector
 
-A simple Python Flask application that listens for incoming GET and POST requests and redirects them to a specified URL (your laptop or VPS). Now includes a web dashboard to view and respond to requests directly.
+A simple Python Flask application that listens for incoming GET and POST requests and redirects them to a specified URL (your laptop or VPS). Now includes an enhanced web dashboard to view and respond to requests directly.
 
 ## Features
 
@@ -10,8 +10,9 @@ A simple Python Flask application that listens for incoming GET and POST request
 - Configurable listening port
 - Health check endpoint
 - Detailed logging
-- **Web dashboard to view and respond to requests** (`/dashboard`)
+- **Enhanced web dashboard** (`/dashboard`) with real-time monitoring
 - In-memory storage of received requests
+- Statistics and request analytics
 
 ## Setup
 
@@ -58,16 +59,19 @@ Once running, the webhook will listen on the specified port (default 5000) and r
 ### Endpoints
 
 - `/` - Main webhook endpoint (handles both GET and POST)
-- `/dashboard` - Web interface to view and respond to requests
+- `/dashboard` - **Enhanced web interface** to view and respond to requests
 - `/health` - Health check endpoint
 
-### Web Dashboard
+### Enhanced Web Dashboard
 
-Access the web dashboard at `http://localhost:5000/dashboard` to:
-- View all received requests with their details
-- See headers, data, and query parameters
-- Send custom responses to requests
+Access the enhanced web dashboard at `http://localhost:5000/dashboard` to:
+- View all received requests with their details in a user-friendly interface
+- See real-time statistics (total requests, POST/GET counts, recent activity)
+- Inspect headers, data, and query parameters with syntax highlighting
+- Send custom responses to requests with configurable status codes
 - Clear request history
+- Send test requests directly from the UI
+- Auto-refresh every 30 seconds
 
 ### Examples
 

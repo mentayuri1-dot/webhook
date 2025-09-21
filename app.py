@@ -20,99 +20,388 @@ REDIRECT_URL = Config.REDIRECT_URL
 LISTEN_PORT = Config.LISTEN_PORT
 HOST = Config.HOST
 
-# HTML template for the web interface
+# Enhanced HTML template for the web interface
 HTML_TEMPLATE = '''
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Webhook Redirector</title>
+    <title>Webhook Monitor - Simple UI</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        .header { background-color: #f5f5f5; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
-        .requests { margin-top: 30px; }
-        .request { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
-        .request-header { background-color: #f9f9f9; padding: 10px; margin: -15px -15px 15px -15px; border-bottom: 1px solid #ddd; }
-        .method { font-weight: bold; color: #007acc; }
-        .url { color: #666; }
-        .timestamp { color: #999; font-size: 0.9em; }
-        .data { background-color: #f8f8f8; padding: 10px; margin: 10px 0; border-radius: 3px; }
-        .actions { margin-top: 15px; }
-        button { background-color: #007acc; color: white; border: none; padding: 8px 15px; border-radius: 3px; cursor: pointer; }
-        button:hover { background-color: #005a9e; }
-        .response-form { margin-top: 15px; display: none; }
-        textarea { width: 100%; height: 100px; }
-        .health { background-color: #dff0d8; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
-        .error { background-color: #f2dede; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --info: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .config-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .config-card {
+            background: rgba(255,255,255,0.15);
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .requests-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        
+        .requests-header {
+            background-color: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .request-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .request-item {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+        
+        .request-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .method-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .method-post {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .method-get {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .timestamp {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .request-details {
+            margin: 15px 0;
+        }
+        
+        .detail-section {
+            margin-bottom: 15px;
+        }
+        
+        .detail-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+        
+        .detail-content {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 200px;
+            overflow: auto;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .response-form {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        textarea, input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            margin: 5px 0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--gray);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .config-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>Webhook Redirector</h1>
-            <p>Listening on: {{ host }}:{{ port }}</p>
-            <p>Redirecting to: {{ redirect_url }}</p>
+        <header>
+            <h1>📬 Webhook Monitor</h1>
+            <p>Monitor and respond to incoming webhook requests</p>
+            
+            <div class="config-info">
+                <div class="config-card">
+                    <h3>📍 Listening Address</h3>
+                    <p>{{ host }}:{{ port }}</p>
+                </div>
+                <div class="config-card">
+                    <h3>🔄 Redirect URL</h3>
+                    <p>{{ redirect_url or 'Not set (requests stored locally)' }}</p>
+                </div>
+                <div class="config-card">
+                    <h3>📊 Status</h3>
+                    <p style="color: #4cc9f0;">🟢 Running</p>
+                </div>
+            </div>
+        </header>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">{{ requests|length }}</div>
+                <div class="stat-label">Total Requests</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ post_count }}</div>
+                <div class="stat-label">POST Requests</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ get_count }}</div>
+                <div class="stat-label">GET Requests</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ recent_count }}</div>
+                <div class="stat-label">Last Hour</div>
+            </div>
         </div>
         
-        {% if health_status == "healthy" %}
-        <div class="health">
-            <h3>System Status: Healthy</h3>
-            <p>All systems operational</p>
-        </div>
-        {% else %}
-        <div class="error">
-            <h3>System Status: Error</h3>
-            <p>{{ health_message }}</p>
-        </div>
-        {% endif %}
-        
-        <div class="actions">
-            <button onclick="refreshRequests()">Refresh Requests</button>
-            <button onclick="clearRequests()">Clear All Requests</button>
+        <div class="controls">
+            <button onclick="refreshRequests()">🔄 Refresh</button>
+            <button class="btn-danger" onclick="clearRequests()">🗑️ Clear All Requests</button>
+            <button class="btn-success" onclick="sendTestRequest()">🧪 Send Test Request</button>
         </div>
         
-        <div class="requests">
-            <h2>Received Requests ({{ requests|length }})</h2>
-            {% if requests %}
-                {% for req in requests|reverse %}
-                <div class="request">
-                    <div class="request-header">
-                        <span class="method">{{ req.method }}</span>
-                        <span class="url">{{ req.url }}</span>
-                        <span class="timestamp">{{ req.timestamp }}</span>
-                    </div>
-                    <h4>Headers:</h4>
-                    <div class="data">
-                        <pre>{{ req.headers|tojson(indent=2) }}</pre>
-                    </div>
-                    {% if req.data %}
-                    <h4>Data:</h4>
-                    <div class="data">
-                        <pre>{{ req.data|tojson(indent=2) }}</pre>
-                    </div>
-                    {% endif %}
-                    {% if req.query_params %}
-                    <h4>Query Parameters:</h4>
-                    <div class="data">
-                        <pre>{{ req.query_params|tojson(indent=2) }}</pre>
-                    </div>
-                    {% endif %}
-                    <div class="actions">
-                        <button onclick="toggleResponseForm('response-form-{{ req.id }}')">Respond to Request</button>
+        <div class="requests-container">
+            <div class="requests-header">
+                <h2>📥 Received Requests</h2>
+                <span>{{ requests|length }} requests</span>
+            </div>
+            
+            <div class="request-list">
+                {% if requests %}
+                    {% for req in requests|reverse %}
+                    <div class="request-item" id="request-{{ req.id }}">
+                        <div class="request-header">
+                            <span class="method-badge method-{{ req.method|lower }}">{{ req.method }}</span>
+                            <span class="timestamp">{{ req.timestamp }}</span>
+                        </div>
+                        <div class="request-url">
+                            <strong>{{ req.url }}</strong>
+                        </div>
+                        
+                        <div class="request-details">
+                            {% if req.headers %}
+                            <div class="detail-section">
+                                <div class="detail-title">📋 Headers</div>
+                                <div class="detail-content">
+                                    <pre>{{ req.headers|tojson(indent=2) }}</pre>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if req.data %}
+                            <div class="detail-section">
+                                <div class="detail-title">📄 Data</div>
+                                <div class="detail-content">
+                                    <pre>{{ req.data|tojson(indent=2) }}</pre>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if req.query_params %}
+                            <div class="detail-section">
+                                <div class="detail-title">🔍 Query Parameters</div>
+                                <div class="detail-content">
+                                    <pre>{{ req.query_params|tojson(indent=2) }}</pre>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="actions">
+                            <button onclick="toggleResponseForm('response-form-{{ req.id }}')">💬 Respond</button>
+                        </div>
+                        
                         <div id="response-form-{{ req.id }}" class="response-form">
-                            <h4>Send Response:</h4>
-                            <textarea id="response-text-{{ req.id }}" placeholder='{"status": "success", "message": "Response received"}'>{"status": "success"}</textarea>
-                            <br><br>
-                            <label>Status Code: <input type="number" id="status-code-{{ req.id }}" value="200" min="100" max="599"></label>
-                            <br><br>
-                            <button onclick="sendResponse('{{ req.id }}')">Send Response</button>
+                            <h4>Send Custom Response</h4>
+                            <textarea id="response-text-{{ req.id }}" placeholder='{"status": "success", "message": "Response received"}'>{"status": "success", "message": "Request processed successfully"}</textarea>
+                            <label>Status Code: 
+                                <input type="number" id="status-code-{{ req.id }}" value="200" min="100" max="599">
+                            </label>
+                            <button class="btn-success" onclick="sendResponse('{{ req.id }}')">Send Response</button>
                         </div>
                     </div>
-                </div>
-                {% endfor %}
-            {% else %}
-                <p>No requests received yet.</p>
-            {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <div>📭</div>
+                        <h3>No Requests Yet</h3>
+                        <p>Send a request to http://{{ host }}:{{ port }}/ to see it here</p>
+                        <button class="btn-success" onclick="sendTestRequest()" style="margin-top: 15px;">Send Test Request</button>
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
     
@@ -149,16 +438,66 @@ HTML_TEMPLATE = '''
             })
             .then(response => response.json())
             .then(data => {
-                alert(data.message);
+                alert('Response sent successfully!');
+                // Hide the response form after sending
+                document.getElementById('response-form-' + requestId).style.display = 'none';
             })
             .catch(error => {
                 alert('Error sending response: ' + error);
             });
         }
+        
+        function sendTestRequest() {
+            fetch('/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'Webhook Monitor UI',
+                    'X-Test-Request': 'true'
+                },
+                body: JSON.stringify({
+                    message: 'This is a test request from the Webhook Monitor UI',
+                    timestamp: new Date().toISOString(),
+                    test: true
+                })
+            })
+            .then(() => {
+                alert('Test request sent! Refresh to see it.');
+                setTimeout(() => location.reload(), 1000);
+            })
+            .catch(error => {
+                alert('Error sending test request: ' + error);
+            });
+        }
+        
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            // Only refresh if we're not in the middle of filling out a form
+            if (!document.querySelector('.response-form[style*="block"]')) {
+                location.reload();
+            }
+        }, 30000);
     </script>
 </body>
 </html>
 '''
+
+def count_requests_by_method(method):
+    """Count requests by HTTP method"""
+    return len([req for req in received_requests if req['method'] == method])
+
+def count_recent_requests(hours=1):
+    """Count requests from the last hour"""
+    now = datetime.now()
+    count = 0
+    for req in received_requests:
+        try:
+            req_time = datetime.strptime(req['timestamp'], '%Y-%m-%d %H:%M:%S')
+            if (now - req_time).total_seconds() < hours * 3600:
+                count += 1
+        except:
+            pass
+    return count
 
 @app.route('/', methods=['GET', 'POST'])
 def webhook_handler():
@@ -273,25 +612,15 @@ def webhook_handler():
 @app.route('/dashboard')
 def dashboard():
     """Web interface to view and respond to requests"""
-    health_status = "healthy"
-    health_message = ""
-    
-    try:
-        # Test if redirect URL is accessible
-        if REDIRECT_URL:
-            requests.get(REDIRECT_URL, timeout=5)
-    except Exception as e:
-        health_status = "warning"
-        health_message = f"Redirect URL not accessible: {str(e)}"
-    
     return render_template_string(
         HTML_TEMPLATE,
         requests=received_requests,
         host=HOST,
         port=LISTEN_PORT,
         redirect_url=REDIRECT_URL,
-        health_status=health_status,
-        health_message=health_message
+        post_count=count_requests_by_method('POST'),
+        get_count=count_requests_by_method('GET'),
+        recent_count=count_recent_requests()
     )
 
 @app.route('/respond/<request_id>', methods=['POST'])
@@ -336,7 +665,8 @@ def health_check():
     return jsonify({
         "status": "healthy",
         "redirect_url": REDIRECT_URL,
-        "listen_port": LISTEN_PORT
+        "listen_port": LISTEN_PORT,
+        "total_requests": len(received_requests)
     }), 200
 
 def main():
