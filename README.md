@@ -154,6 +154,11 @@ The application includes a Procfile for deployment with Dokploy:
 2. Connect Dokploy to your repository
 3. Dokploy will automatically detect and deploy the application
 
+For your specific setup with Dokploy at http://31.220.87.209:3000/:
+1. The webhook will listen on port 5000
+2. Make sure port 5000 is accessible in your firewall
+3. Set the REDIRECT_URL to wherever you want the requests forwarded
+
 ### Using with Ngrok (for local testing)
 
 If you want to test with a local machine:
