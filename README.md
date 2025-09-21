@@ -146,6 +146,14 @@ To run this webhook on a server to receive external requests:
 2. Ensure the `LISTEN_PORT` is accessible (configure firewall if needed)
 3. Run the application
 
+### Using with Dokploy
+
+The application includes a Procfile for deployment with Dokploy:
+
+1. Push your code to a Git repository
+2. Connect Dokploy to your repository
+3. Dokploy will automatically detect and deploy the application
+
 ### Using with Ngrok (for local testing)
 
 If you want to test with a local machine:
